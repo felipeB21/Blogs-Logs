@@ -1,66 +1,37 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
 import Link from "next/link";
+import { loginRequest } from "@/api/auth";
 
 export default function LoginForm() {
   const router = useRouter();
-
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const { register: login, handleSubmit } = useForm();
 
   const [errors, setErrors] = useState(null);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await fetch("http://localhost:3030/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        const responseData = await response.json();
-        router.push("/");
-      } else {
-        const errorData = await response.json();
-        setErrors(errorData.errors);
-      }
+      const response = await loginRequest(data);
+      console.log(response);
     } catch (error) {
-      console.error("Error:", error);
+      console.log(error.response.data.errors);
     }
-  };
+  });
 
   return (
     <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]">
       <div className="flex flex-col justify-center items-center min-h-screen">
         <div>
-          <form className="flex flex-col" onSubmit={handleSubmit}>
+          <form className="flex flex-col" onSubmit={onSubmit}>
             <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              name="email"
-              onChange={handleChange}
-              value={formData.email}
-            />
+            <input type="email" {...login("email", { required: true })} />
             {errors?.email && (
               <div className="text-red-500">{errors.email.msg}</div>
             )}
             <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              name="password"
-              onChange={handleChange}
-              value={formData.password}
-            />
+            <input type="password" {...login("password", { required: true })} />
             {errors?.password && (
               <div className="text-red-500">{errors.password.msg}</div>
             )}

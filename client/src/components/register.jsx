@@ -1,79 +1,80 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState(null);
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const { signUp, isAuthenticated, errors: apiErrors } = useAuth();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:3030/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        window.location.href = "/";
-      } else {
-        const errorData = await response.json();
-        setErrors(errorData.errors);
-      }
-    } catch (error) {
-      console.error("Error:", error);
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/");
     }
-  };
+  }, [isAuthenticated]);
+
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const response = await signUp(data); // Handle data in your API endpoint
+    } catch (error) {
+      console.error("API error:", error);
+    }
+  });
 
   return (
     <div className="absolute top-0 z-[-2] h-screen w-screen bg-white bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]">
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <form className="flex flex-col" onSubmit={handleSubmit}>
+        <form className="flex flex-col" onSubmit={onSubmit}>
           <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-          />
-          {errors?.username && <p className="error">{errors.username.msg}</p>}
+          <input type="text" {...register("username", { required: true })} />
+          {errors?.username && (
+            <div className="error">Username is required</div>
+          )}
+          {apiErrors?.username && (
+            <div className="error">{apiErrors.username.msg}</div>
+          )}
           <label htmlFor="email">Email</label>
           <input
             type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
+            {...register("email", {
+              required: true,
+            })}
           />
-          {errors?.email && <p className="error">{errors.email.msg}</p>}
+          {errors?.email && <div className="error">Email is required</div>}
+          {apiErrors?.email && (
+            <div className="error">{apiErrors.email.msg}</div>
+          )}
           <label htmlFor="password">Password</label>
           <input
             type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
+            {...register("password", {
+              required: true,
+            })}
           />
-          {errors?.password && <p className="error">{errors.password.msg}</p>}
+          {errors?.password && (
+            <div className="error">Password is required</div>
+          )}
+          {apiErrors?.password && (
+            <div className="error">{apiErrors.password.msg}</div>
+          )}
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input
             type="password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
+            {...register("confirmPassword", {
+              required: true,
+            })}
           />
-          {errors?.confirmPassword && (
-            <p className="error">{errors.confirmPassword.msg}</p>
+          {apiErrors?.confirmPassword && (
+            <div className="error">{apiErrors.confirmPassword.msg}</div>
           )}
+
           <button className="submit" type="submit">
             Register
           </button>

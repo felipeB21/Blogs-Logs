@@ -47,7 +47,7 @@ module.exports = {
       if (!user) {
         return res
           .status(400)
-          .json({ errors: { email: { msg: "Email not found" } } });
+          .json({ errors: { email: { msg: ["Email not found"] } } });
       } else {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
