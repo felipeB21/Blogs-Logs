@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const createAccesToken = require("../libs/jwt");
+const jwt = require("jsonwebtoken");
 
 module.exports = {
   register: async (req, res) => {
@@ -11,7 +12,7 @@ module.exports = {
     }
 
     try {
-      const { username, email, password } = req.body;
+      const { username, email, password, avatar } = req.body;
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res
@@ -23,6 +24,7 @@ module.exports = {
         username,
         email,
         password: hashedPassword,
+        avatar,
       });
 
       const userCreated = await newUser.save();
@@ -32,6 +34,7 @@ module.exports = {
         message: "User registered successfully.",
         id: userCreated._id,
         username: userCreated.username,
+        avatar: userCreated.avatar,
         email: userCreated.email,
         createdAt: userCreated.createdAt,
         updatedAt: userCreated.updatedAt,
@@ -76,6 +79,24 @@ module.exports = {
       expires: new Date(0),
     });
     return res.sendStatus(200);
+  },
+  verifyToken: async (req, res) => {
+    const { token } = req.cookies;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
+      if (err) return res.status(401).json({ message: "Invalid token" });
+      const foundUser = await User.findById(user.id);
+      if (!foundUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      return res.json({
+        id: foundUser._id,
+        username: foundUser.username,
+        email: foundUser.email,
+      });
+    });
   },
   profile: async (req, res) => {
     try {

@@ -1,6 +1,9 @@
+"use client";
+import { useAuth } from "@/app/context/AuthContext";
 import Link from "next/link";
 
 export default function HeroPage() {
+  const { isAuthenticated } = useAuth();
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="flex flex-col items-center animate-fade-up animate-duration-[2000ms]">
@@ -16,7 +19,7 @@ export default function HeroPage() {
         </div>
         <Link
           className="animate-fade-up animate-duration-[3000ms] animate-delay-200 mt-2"
-          href="/register"
+          href={isAuthenticated ? "/community" : "/login"}
         >
           <button className="py-3 px-6 bg-sky-500 text-white font-medium rounded-md hover:bg-sky-600">
             Join our community

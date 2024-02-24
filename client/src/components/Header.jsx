@@ -1,16 +1,19 @@
+"use client";
+import { useAuth } from "@/app/context/AuthContext";
+import Image from "next/image";
 import Link from "next/link";
 
 const links = [
   { name: "Blogs", href: "/blogs" },
   { name: "Code", href: "/code" },
-  { name: "Issues", href: "/issues" },
   { name: "Community", href: "/community" },
   { name: "About", href: "/about" },
 ];
 
 export default function Header() {
+  const { user } = useAuth();
   return (
-    <header className="py-4 bg-white/40 backdrop-blur-3xl">
+    <header className="fixed top-0 w-full py-4 bg-white/40 backdrop-blur-3xl">
       <div className="w-[1000px] mx-auto flex items-center justify-between">
         <div className="flex items-center gap-12">
           <Link className="text-lg font-bold" href="/">
@@ -31,11 +34,20 @@ export default function Header() {
           </nav>
         </div>
         <div>
-          <Link href="/login">
-            <button className="py-2 px-6 border font-medium rounded-md hover:bg-neutral-200">
-              Sign in
-            </button>
-          </Link>
+          {user ? (
+            <p className="py-2">
+              Welcome, {""}
+              <Link href="/profile">
+                <strong>{user.username}</strong>
+              </Link>
+            </p>
+          ) : (
+            <Link href="/login">
+              <button className="py-2 px-6 border font-medium rounded-md hover:bg-neutral-200">
+                Sign in
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </header>

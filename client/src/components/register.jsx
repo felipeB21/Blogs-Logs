@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 
@@ -12,7 +12,7 @@ const RegisterForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { signUp, isAuthenticated, errors: apiErrors } = useAuth();
+  const { signUp, isAuthenticated, errors: apiErrors, loading } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -22,7 +22,7 @@ const RegisterForm = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await signUp(data); // Handle data in your API endpoint
+      const response = await signUp(data);
     } catch (error) {
       console.error("API error:", error);
     }
@@ -74,7 +74,6 @@ const RegisterForm = () => {
           {apiErrors?.confirmPassword && (
             <div className="error">{apiErrors.confirmPassword.msg}</div>
           )}
-
           <button className="submit" type="submit">
             Register
           </button>

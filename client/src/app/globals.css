@@ -15,3 +15,6 @@ input {
 .error {
   @apply text-red-600 max-w-[300px] text-sm;
 }
+textarea {
+  resize: none;
+}

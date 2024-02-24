@@ -3,15 +3,22 @@ const { validationResult } = require("express-validator");
 
 module.exports = {
   getCode: async (req, res) => {
-    const codes = await Code.find().populate("user");
+    const codes = await Code.find()
+      .populate("user")
+      .sort({ createdAt: "desc" });
     if (!codes) return res.status(404).json({ message: "Codes not found" });
     res.json(codes);
   },
   getCodeById: async (req, res) => {
     const { id } = req.params;
-    const code = await Code.findById(id);
-    if (!code) return res.status(404).json({ message: "Code not found" });
-    res.json(code);
+    try {
+      const code = await Code.findById(id).populate("user");
+      if (!code) return res.status(404).json({ message: "Code not found" });
+      res.json({ code });
+    } catch (error) {
+      console.error("Error fetching code:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
   },
   createCode: async (req, res) => {
     const errors = validationResult(req);

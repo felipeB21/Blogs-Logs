@@ -1,7 +1,7 @@
 "use client";
-import { createContext, useState, useContext } from "react";
-import { registerRequest } from "@/api/auth";
-
+import { createContext, useState, useContext, useEffect } from "react";
+import { registerRequest, loginRequest, verifyTokenRequest } from "@/api/auth";
+import Cookies from "js-cookie";
 export const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [errors, setErrors] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const signUp = async (user) => {
     try {
@@ -23,12 +24,50 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data);
       setIsAuthenticated(true);
     } catch (error) {
-      console.log(error.response.data.errors);
       setErrors(error.response.data.errors);
     }
   };
+  const signIn = async (user) => {
+    try {
+      const response = await loginRequest(user);
+      setUser(response.data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      setErrors(error.response.data.errors);
+    }
+  };
+  useEffect(() => {
+    async function checkAuth() {
+      const cookies = Cookies.get();
+      if (!cookies.token) {
+        setIsAuthenticated(false);
+        setUser(null);
+        return;
+      }
+      try {
+        const response = await verifyTokenRequest(cookies.token);
+        if (!response.data) {
+          setIsAuthenticated(false);
+          setLoading(false);
+          return;
+        }
+
+        setIsAuthenticated(true);
+        setUser(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+        setIsAuthenticated(false);
+        setUser(null);
+        setLoading(false);
+      }
+    }
+    checkAuth();
+  }, []);
   return (
-    <AuthContext.Provider value={{ signUp, user, isAuthenticated, errors }}>
+    <AuthContext.Provider
+      value={{ signUp, signIn, user, isAuthenticated, errors, loading }}
+    >
       {children}
     </AuthContext.Provider>
   );

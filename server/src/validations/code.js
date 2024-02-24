@@ -13,5 +13,11 @@ module.exports = [
     .bail()
     .isLength({ min: 3, max: 255 })
     .withMessage("Description must be between 3 and 255 characters"),
+  body("code")
+    .notEmpty()
+    .withMessage("Code is required")
+    .bail()
+    .isLength({ min: 3, max: 255 })
+    .withMessage("Code must be between 3 and 255 characters"),
   body("tags").notEmpty().withMessage("Tags are required"),
 ];

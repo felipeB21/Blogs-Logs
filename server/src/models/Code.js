@@ -9,7 +9,7 @@ const codeSchema = new Schema(
     title: { type: String, required: true },
     description: { type: String, required: true },
     code: { type: String, required: false },
-    tags: { type: String, required: true },
+    tags: { type: [String], required: true },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
   },
   {

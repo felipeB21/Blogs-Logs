@@ -1,22 +1,31 @@
 "use client";
-import React, { useState } from "react";
+
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import { loginRequest } from "@/api/auth";
+import { useAuth } from "@/app/context/AuthContext";
+import { useEffect } from "react";
 
 export default function LoginForm() {
   const router = useRouter();
-  const { register: login, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+  const { signIn, isAuthenticated, errors: apiErrors, loading } = useAuth();
 
-  const [errors, setErrors] = useState(null);
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await loginRequest(data);
-      console.log(response);
+      signIn(data);
     } catch (error) {
-      console.log(error.response.data.errors);
+      console.error("API error:", error);
     }
   });
 
@@ -26,14 +35,21 @@ export default function LoginForm() {
         <div>
           <form className="flex flex-col" onSubmit={onSubmit}>
             <label htmlFor="email">Email</label>
-            <input type="email" {...login("email", { required: true })} />
-            {errors?.email && (
-              <div className="text-red-500">{errors.email.msg}</div>
+            <input type="email" {...register("email", { required: true })} />
+            {errors?.email && <div className="error">Email is required</div>}
+            {apiErrors?.email && (
+              <div className="error">{apiErrors.email.msg}</div>
             )}
             <label htmlFor="password">Password</label>
-            <input type="password" {...login("password", { required: true })} />
+            <input
+              type="password"
+              {...register("password", { required: true })}
+            />
             {errors?.password && (
-              <div className="text-red-500">{errors.password.msg}</div>
+              <div className="error">Password is required</div>
+            )}
+            {apiErrors?.password && (
+              <div className="error">{apiErrors.password.msg}</div>
             )}
             <button className="submit" type="submit">
               Sign in
