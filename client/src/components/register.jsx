@@ -22,7 +22,7 @@ const RegisterForm = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await signUp(data);
+      signUp(data);
     } catch (error) {
       console.error("API error:", error);
     }

@@ -16,3 +16,13 @@ export const verifyTokenRequest = async (token) => {
   });
   return response;
 };
+
+export const profileRequest = async (id) => {
+  const response = await axios.get(`/profile/${id}`);
+  return response;
+};
+
+export const getAllUsersRequest = async () => {
+  const response = await axios.get("/users");
+  return response;
+};

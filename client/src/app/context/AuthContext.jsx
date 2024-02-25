@@ -1,6 +1,12 @@
 "use client";
 import { createContext, useState, useContext, useEffect } from "react";
-import { registerRequest, loginRequest, verifyTokenRequest } from "@/api/auth";
+import {
+  registerRequest,
+  loginRequest,
+  verifyTokenRequest,
+  profileRequest,
+  getAllUsersRequest,
+} from "@/api/auth";
 import Cookies from "js-cookie";
 export const AuthContext = createContext();
 
@@ -14,9 +20,11 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [errors, setErrors] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [allUsers, setAllUsers] = useState([]);
 
   const signUp = async (user) => {
     try {
@@ -33,6 +41,26 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data);
       setIsAuthenticated(true);
     } catch (error) {
+      setErrors(error.response.data.errors);
+    }
+  };
+
+  const getProfile = async (id) => {
+    try {
+      const response = await profileRequest(id);
+      setUserProfile(response.data);
+    } catch (error) {
+      console.log(error);
+      setErrors(error.response.data.errors);
+    }
+  };
+
+  const getAllUsers = async (users) => {
+    try {
+      const response = await getAllUsersRequest(users);
+      setAllUsers(response.data);
+    } catch (error) {
+      console.log(error);
       setErrors(error.response.data.errors);
     }
   };
@@ -66,7 +94,18 @@ export const AuthProvider = ({ children }) => {
   }, []);
   return (
     <AuthContext.Provider
-      value={{ signUp, signIn, user, isAuthenticated, errors, loading }}
+      value={{
+        signUp,
+        signIn,
+        getProfile,
+        getAllUsers,
+        user,
+        userProfile,
+        allUsers,
+        isAuthenticated,
+        errors,
+        loading,
+      }}
     >
       {children}
     </AuthContext.Provider>

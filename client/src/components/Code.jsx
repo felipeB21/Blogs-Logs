@@ -21,7 +21,7 @@ export default function Code() {
               className="p-2 rounded bg-sky-500 font-medium text-white hover:bg-sky-600"
               href="/code/create"
             >
-              Create code
+              Upload code
             </Link>
           </div>
           <div className="mt-5">

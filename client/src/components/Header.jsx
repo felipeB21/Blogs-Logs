@@ -1,7 +1,8 @@
 "use client";
 import { useAuth } from "@/app/context/AuthContext";
-import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import LoadingIcon from "./icons/LoadingIcon";
 
 const links = [
   { name: "Blogs", href: "/blogs" },
@@ -11,7 +12,17 @@ const links = [
 ];
 
 export default function Header() {
-  const { user } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsLoaded(!loading);
+  }, [loading]);
+
+  useEffect(() => {
+    setIsLoaded(true);
+  }, [isAuthenticated]);
+
   return (
     <header className="fixed top-0 w-full py-4 bg-white/40 backdrop-blur-3xl">
       <div className="w-[1000px] mx-auto flex items-center justify-between">
@@ -34,19 +45,25 @@ export default function Header() {
           </nav>
         </div>
         <div>
-          {user ? (
-            <p className="py-2">
-              Welcome, {""}
-              <Link href="/profile">
-                <strong>{user.username}</strong>
+          {isLoaded ? (
+            isAuthenticated ? (
+              <p className="py-2">
+                Welcome, {""}
+                <Link href={`/user/${user.id}`}>
+                  <strong>{user.username}</strong>
+                </Link>
+              </p>
+            ) : (
+              <Link href="/login">
+                <button className="py-2 px-6 border font-medium rounded-md hover:bg-neutral-200">
+                  Sign in
+                </button>
               </Link>
-            </p>
+            )
           ) : (
-            <Link href="/login">
-              <button className="py-2 px-6 border font-medium rounded-md hover:bg-neutral-200">
-                Sign in
-              </button>
-            </Link>
+            <div className="py-1.5">
+              <LoadingIcon />
+            </div>
           )}
         </div>
       </div>

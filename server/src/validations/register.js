@@ -8,6 +8,13 @@ module.exports = [
     .isString()
     .withMessage("Invalid username")
     .bail()
+    .custom((value) => {
+      if (/\s/.test(value)) {
+        throw new Error("Username must not contain spaces");
+      }
+      return true;
+    })
+    .bail()
     .isLength({ min: 3, max: 20 })
     .withMessage("Username must be between 3 and 20 characters"),
   body("email")

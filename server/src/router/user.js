@@ -7,8 +7,9 @@ const validateToken = require("../middlewares/validateToken");
 
 router.post("/register", registerValidator, userController.register);
 router.post("/login", userController.login);
-router.post("/logout", userController.logout);
+router.post("/logout", validateToken, userController.logout);
 router.get("/verify", userController.verifyToken);
-router.get("/profile", validateToken, userController.profile);
+router.get("/profile/:id", userController.profile);
+router.get("/users", userController.getUsers);
 
 module.exports = router;

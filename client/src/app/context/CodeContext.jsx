@@ -1,6 +1,10 @@
 "use client";
 import { createContext, useContext, useState } from "react";
-import { codePostRequest, codeGetRequest } from "@/api/code";
+import {
+  codePostRequest,
+  codeGetRequest,
+  codeGetRequestById,
+} from "@/api/code";
 
 const CodeContext = createContext();
 
@@ -27,12 +31,20 @@ export function CodeProvider({ children }) {
     }
   };
 
+  const getCodeById = async (id) => {
+    try {
+      const response = await codeGetRequestById(id);
+      setCode(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const createCode = async (code) => {
     try {
       const response = await codePostRequest(code);
-      console.log(response);
+      setCode(response.data);
     } catch (error) {
-      console.log(error.response.data.errors);
       setErrors(error.response.data.errors);
     }
   };
@@ -42,6 +54,7 @@ export function CodeProvider({ children }) {
         code,
         createCode,
         getCode,
+        getCodeById,
         errors,
       }}
     >

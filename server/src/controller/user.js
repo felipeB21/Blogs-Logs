@@ -63,7 +63,6 @@ module.exports = {
       const token = await createAccesToken({ id: user._id });
       res.cookie("token", token);
       res.json({
-        message: "User logged in successfully.",
         id: user._id,
         username: user.username,
         email: user.email,
@@ -95,12 +94,14 @@ module.exports = {
         id: foundUser._id,
         username: foundUser.username,
         email: foundUser.email,
+        createdAt: foundUser.createdAt,
       });
     });
   },
   profile: async (req, res) => {
     try {
-      const userById = await User.findById(req.user.id);
+      const { id } = req.params;
+      const userById = await User.findById(id);
       if (!userById) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -111,6 +112,17 @@ module.exports = {
         createdAt: userById.createdAt,
         updatedAt: userById.updatedAt,
       });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+  getUsers: async (req, res) => {
+    try {
+      const users = await User.find();
+      if (users.length === 0) {
+        return res.status(404).json({ message: "Users not found" });
+      }
+      res.json(users);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
