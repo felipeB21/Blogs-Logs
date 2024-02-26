@@ -14,7 +14,7 @@ export default function Community() {
 
   useEffect(() => {
     let progress = 0;
-    const duration = 1400;
+    const duration = 600;
     let interval = null;
 
     const animateCount = () => {

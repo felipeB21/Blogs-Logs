@@ -18,3 +18,7 @@ input {
 textarea {
   resize: none;
 }
+
+.border-b {
+  border-bottom: solid 1px #999999;
+}

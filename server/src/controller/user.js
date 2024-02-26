@@ -102,7 +102,7 @@ module.exports = {
     try {
       const { id } = req.params;
       const userById = await User.findById(id);
-      if (!userById) {
+      if (userById === null) {
         return res.status(404).json({ message: "User not found" });
       }
       res.json({
